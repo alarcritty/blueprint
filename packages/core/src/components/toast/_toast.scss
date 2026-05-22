@@ -80,7 +80,7 @@ $toast-intent-colors: (
 .#{$ns}-toast {
   // toast transition properties
   $enter-translate: (
-    transform: translateY(-$toast-height) translateY(0),
+    transform: translateY(-($toast-margin + $toast-height)) translateY(0),
   );
   $leave-blur: (
     opacity: 0 1,

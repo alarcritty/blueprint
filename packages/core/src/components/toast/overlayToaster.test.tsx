@@ -149,6 +149,37 @@ describe("OverlayToaster", () => {
             );
         });
 
+        it("dismiss() applies the exit class to the dismissed toast, not a sibling", async () => {
+            toaster.show({ message: "anim-old" });
+            const middleKey = toaster.show({ message: "anim-mid" });
+            toaster.show({ message: "anim-new" });
+            await waitFor(() => assert.lengthOf(toaster.getToasts(), 3), {
+                timeout: 3 * OVERLAY_TOASTER_DELAY_MS,
+            });
+
+            const findToast = (text: string) =>
+                Array.from(document.querySelectorAll<HTMLElement>(`.${Classes.TOAST}`)).find(t =>
+                    t.textContent?.includes(text),
+                );
+            const dismissedToast = findToast("anim-mid");
+            const newestToast = findToast("anim-new");
+            assert.exists(dismissedToast, "expected middle toast in DOM");
+            assert.exists(newestToast, "expected newest toast in DOM");
+
+            toaster.dismiss(middleKey);
+
+            await waitFor(() => {
+                assert.isTrue(
+                    dismissedToast!.classList.contains(`${Classes.TOAST}-exit`),
+                    "expected dismissed toast to receive exit class",
+                );
+                assert.isFalse(
+                    newestToast!.classList.contains(`${Classes.TOAST}-exit`),
+                    "expected newest toast not to receive exit class",
+                );
+            });
+        });
+
         it("clear() removes all toasts", async () => {
             toaster.show({ message: "one" });
             toaster.show({ message: "two" });
